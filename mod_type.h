@@ -1,8 +1,17 @@
+#include <limits>
+
 #ifndef MOD_TYPE_H_INCLUDED
 #define MOD_TYPE_H_INCLUDED
 
-template <typename T, T UB>
+template <typename T, long int UB>
 class Mod_Type {
+
+    static_assert(UB <= std::numeric_limits<T>::max(),
+                  "Upper bound exceeds type maximum possible value");
+
+    static_assert(UB > 0,
+                  "Upper bound is not positive(and non-zero)");
+
 public:
     Mod_Type() : val {0} {}
 
