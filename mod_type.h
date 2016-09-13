@@ -6,6 +6,9 @@
 template <typename T, long int UB>
 class Mod_Type {
 
+    static_assert(std::is_integral<T>::value,
+                  "Type must be integral");
+
     static_assert(UB <= std::numeric_limits<T>::max(),
                   "Upper bound exceeds type maximum possible value");
 
