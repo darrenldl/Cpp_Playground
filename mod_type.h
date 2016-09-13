@@ -8,49 +8,87 @@ public:
 
     Mod_Type(T a) : val {mod_val(a)} {}
 
+    T value () const {
+        return this->val;
+    }
+
     friend std::ostream& operator<< (std::ostream& out, const Mod_Type& a) {
         out << a.val;
         return out;
     }
 
-    Mod_Type operator+ () {
+    Mod_Type operator+ () const {
         return *this;
     }
 
-    Mod_Type operator- () {
+    Mod_Type operator- () const {
         return mod_val(-val);
     }
 
-    friend Mod_Type operator+ (Mod_Type a, T b) {
+    friend Mod_Type operator+ (const Mod_Type& a, const Mod_Type& b) {
+        return a.val + b.val;
+    }
+
+    friend Mod_Type operator+ (const Mod_Type& a, const T& b) {
         return a.val + mod_val(b);
     }
 
-    friend Mod_Type operator+ (T b, Mod_Type a) {
+    friend Mod_Type operator+ (const T& b, const Mod_Type& a) {
         return a + b;
     }
 
-    friend Mod_Type operator- (Mod_Type a, T b) {
+    friend Mod_Type operator- (const Mod_Type& a, const T& b) {
         return a + (-b);
     }
 
-    friend Mod_Type operator- (T b, Mod_Type a) {
+    friend Mod_Type operator- (const T& b, const Mod_Type& a) {
         return b + (-a);
     }
 
-    friend Mod_Type operator* (Mod_Type a, T b) {
+    friend Mod_Type operator* (const Mod_Type& a, const T& b) {
         return a.val * mod_val(b);
     }
 
-    friend Mod_Type operator* (T b, Mod_Type a) {
+    friend Mod_Type operator* (const T& b, const Mod_Type& a) {
         return a * b;
     }
 
     Mod_Type operator++ () {
-        return *this + 1;
+        return (*this) += 1;
+    }
+
+    Mod_Type operator++ (int) {
+        T ret = val;
+        (*this) += 1;
+        return ret;
     }
 
     Mod_Type operator-- () {
-        return *this - 1;
+        return (*this) -= 1;
+    }
+
+    Mod_Type operator-- (int) {
+        T ret = val;
+        (*this) -= 1;
+        return ret;
+    }
+
+    Mod_Type operator+= (const Mod_Type& a) {
+        this->val = mod_val(this->val + a.val);
+        return *this;
+    }
+
+    Mod_Type operator+= (const T& a) {
+        val = mod_val(val + mod_val(a));
+        return *this;
+    }
+
+    Mod_Type operator-= (const Mod_Type& a) {
+        return (*this) += -a;
+    }
+
+    Mod_Type operator-= (const T& a) {
+        return (*this) += -a;
     }
 
 private:
