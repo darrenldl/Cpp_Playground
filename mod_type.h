@@ -56,8 +56,16 @@ public:
         this->val = a.val;
     }
 
+    operator T() const {
+        return this->val;
+    }
+
     T value () const {
         return this->val;
+    }
+
+    T bound () const {
+        return this->upper_bound;
     }
 
     friend std::ostream& operator<< (std::ostream& out, const Mod_Type& a) {
