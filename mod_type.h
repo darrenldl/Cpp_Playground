@@ -52,9 +52,7 @@ public:
 
     Mod_Type(T a) : val {mod_val(a)} {}
 
-    Mod_Type(const Mod_Type& a) {
-        this->val = a.val;
-    }
+    Mod_Type(const Mod_Type& a) : val {mod_val(a.val)} {}
 
     operator T() const {
         return this->val;
