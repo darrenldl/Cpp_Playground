@@ -52,6 +52,10 @@ public:
 
     Mod_Type(T a) : val {mod_val(a)} {}
 
+    Mod_Type(const Mod_Type& a) {
+        this->val = a.val;
+    }
+
     T value () const {
         return this->val;
     }
