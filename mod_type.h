@@ -1,4 +1,5 @@
 /* Modulo type template which functions similarly to modulo type in Ada
+ * No integer overflow/underflow should occur during operations of this type
  *
  * Author : Darrenldl <dldldev@yahoo.com>
  *
@@ -69,11 +70,11 @@ public:
     }
 
     friend Mod_Type operator+ (const Mod_Type& a, const Mod_Type& b) {
-        return a.val + b.val;
+        return mod_add(a.val, b.val);
     }
 
     friend Mod_Type operator+ (const Mod_Type& a, const T& b) {
-        return a.val + mod_val(b);
+        return mod_add(a.val, b);
     }
 
     friend Mod_Type operator+ (const T& b, const Mod_Type& a) {
@@ -88,8 +89,12 @@ public:
         return b + (-a);
     }
 
+    friend Mod_Type operator* (const Mod_Type& a, const Mod_Type& b) {
+        return mod_mul(a.val, b.val);
+    }
+
     friend Mod_Type operator* (const Mod_Type& a, const T& b) {
-        return a.val * mod_val(b);
+        return mod_mul(a.val, b);
     }
 
     friend Mod_Type operator* (const T& b, const Mod_Type& a) {
@@ -117,12 +122,12 @@ public:
     }
 
     Mod_Type operator+= (const Mod_Type& a) {
-        this->val = mod_val(this->val + a.val);
+        this->val = mod_add(this->val, a.val);
         return *this;
     }
 
     Mod_Type operator+= (const T& a) {
-        val = mod_val(val + mod_val(a));
+        this->val = mod_add(val, mod_val(a));
         return *this;
     }
 
@@ -132,6 +137,16 @@ public:
 
     Mod_Type operator-= (const T& a) {
         return (*this) += -a;
+    }
+
+    Mod_Type operator *= (const Mod_Type& a) {
+        this->val = mod_mul(this->val, a.val);
+        return *this;
+    }
+
+    Mod_Type operator *= (const T& a) {
+        this->val = mod_mul(this->val, a);
+        return *this;
     }
 
 private:
@@ -149,6 +164,60 @@ private:
         }
 
         return a;
+    }
+
+    static T mod_add (T a, T b) {
+        a = mod_val(a);
+        b = mod_val(b);
+
+        T space_left_a;
+
+        while (true) {
+            space_left_a = std::numeric_limits<T>::max() - a;
+
+            if (space_left_a < b) { // overflow
+                // b must be <= upper_bound due to mod_val above
+                // b also > upper_bound - a, since b > space_left_a
+                // and space_left_a >= upper_bound - a
+
+                // add portion of b to a that results in 0
+                b -= upper_bound - a;
+                a = 0;
+            }
+            else {
+                a += b;
+                break;
+            }
+        }
+
+        return mod_val(a);
+    }
+
+    static T mod_mul (T a, T b) {
+        a = mod_val(a);
+        b = mod_val(b);
+
+        if (a == 0 || b == 0) {
+            return 0;
+        }
+
+        T acc = 0;
+
+        const T max_mutliplier_a = std::numeric_limits<T>::max() / a;   // deliberate truncation
+
+        while (true) {
+            if (max_mutliplier_a < b) { // overflow
+                // multiply by mutlipliable portion first
+                acc = mod_add(acc, mod_val(a * max_mutliplier_a));
+                b -= max_mutliplier_a;
+            }
+            else {
+                acc = mod_add(acc, a * b);
+                break;
+            }
+        }
+
+        return mod_val(acc);
     }
 };
 
