@@ -15,7 +15,7 @@ Usage:
         Mod_Type<integral_type, upper_bound> variable_name;
     # Example
         Mod_Type<unsigned int, 5> i;  // by default initialised to 0
-        All operations on i will be reduced modulo 100, i is always in {0, 1, ..., 99}
+        All operations on i will be reduced modulo 100, i is always in {0, 1, 2, 3, 4}
     
     # Operations supported
     Arithemetic         : +, -, *
