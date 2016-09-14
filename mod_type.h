@@ -155,6 +155,13 @@ private:
 
     static T mod_val (T a) {
         if (a < 0) {
+            if (a == std::numeric_limits<T>::min()) {
+                // prevent negating from wrapping back to same value
+                // this is to deal with case where number of negative values is one greater than number of non-negative values
+                // aka two's complement
+                a += upper_bound;   // would not change the result in modulo arithmetic
+            }
+
             a = -a;
             a = a % upper_bound;
             a = upper_bound - a;
