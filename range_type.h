@@ -201,7 +201,7 @@ private:
         if (val > L) {
             error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
             error_message << "Goal : "    << +val           << std::endl;
-            error_message << "value is greater than largest possible value";
+            error_message << "Value is greater than largest possible value";
             throw RangeTypeException(error_message.str());
         }
 
