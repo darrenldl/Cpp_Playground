@@ -34,9 +34,56 @@ Usage:
         (it will always wrap around the upper bound)
         
         Given the value provided does not overflow in the operation call,
+        and causing wrap around to occur before arriving in the function,
         then all operations will not cause overflow/underflow
         
         Example:
             Mod_Type<int, 2147483647> k = 2147483646;   // assume upper limit of int is 2147483647
             k + 2147483646; // gives 2147483645, which is correct
                             // despite adding both number directly is beyond the type upper limit
+
+### range_type.h
+Template for range type, which behaves similarly to range type in Ada
+
+Usage:
+
+    # General format
+        Range_Type<integral_type, first_value, last_value> variable_name;
+    # Example
+        Range_Type<int, -5, 4> i;  // by default initialised to first_val, in this case, -5
+        All operations on i will be checked for range, i must be in [-5, 4]
+    
+    # Operations supported
+    Arithemetic         : +, -, *
+        i = 10;         // not okay as it causes overflow
+        i = -5; i + 6;  // gives 1
+        i = 1;  i - 7;  // not okay as it causes underflow
+        i = -1; i * 5;  // not okay as it causes overflow
+        
+    Increment/decrement : +=, -=, ++(both prefix and postfix), --(both prefix and postfix)
+        i = 0; i += 2; // gives 2
+    
+    # Static asserts
+        Type is asserted to be of integral type
+        First possible value is asserted to be greater than or equal to minimum possible value of the given type
+        Last possible value is asserted to be less than or equal to maximum possible value of the given type
+        First possible value is asserted to be less than or equal to last possible value
+        
+    # Overflow/underflow handling
+        All overflowing/underflowing operations will throw exception RangeTypeException
+        RangeTypeException.what() gives complete error message
+        
+        All failing operations will not result change in value of the Range_Type variable
+        
+        Example:
+            Range_Type<int, -10, 10> k = 0;
+            try {
+                std::cout << k + 11 << std::endl;
+            }
+            catch (RangeTypeException e) {
+                std::cout << e.what() << std::endl;
+            }
+            
+            Output:
+            Range : [ -10, 10 ]    Operation : 0 + 11
+            Addition causes overflow
