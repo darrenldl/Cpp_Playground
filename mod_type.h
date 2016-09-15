@@ -35,7 +35,7 @@
 #ifndef MOD_TYPE_H_INCLUDED
 #define MOD_TYPE_H_INCLUDED
 
-template <typename T, long int UB>
+template <typename T, long long int UB>
 class Mod_Type {
 
     static_assert(std::is_integral<T>::value,
@@ -67,7 +67,7 @@ public:
     }
 
     friend std::ostream& operator<< (std::ostream& out, const Mod_Type& a) {
-        out << a.val;
+        out << +a.val;
         return out;
     }
 
