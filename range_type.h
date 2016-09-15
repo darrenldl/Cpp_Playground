@@ -47,11 +47,11 @@ private:
 
 template <typename T, long long int F, long long int L>
 class Range_Type : public std::iterator<std::random_access_iterator_tag,
-                                          T,
-                                          T,
-                                          const T*,
-                                          T
-                                         >
+                                        T,
+                                        T,
+                                        const T*,
+                                        T
+                                       >
 {
 
     static_assert(std::is_integral<T>::value,
