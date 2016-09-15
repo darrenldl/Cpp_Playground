@@ -174,6 +174,7 @@ private:
 
             a = -a;
             a = a % upper_bound;
+
             if (a != 0) {
                 a = upper_bound - a;
             }
