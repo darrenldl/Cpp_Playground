@@ -83,6 +83,10 @@ public:
         return this->upper_limit;
     }
 
+    T size () const {
+        return this->upper_limit - this->lower_limit + 1;
+    }
+
     friend std::ostream& operator<< (std::ostream& out, const Range_Type& a) {
         out << +a.val;
         return out;
@@ -138,12 +142,18 @@ public:
 
     Range_Type operator++ (int) {
         T ret = val;
-        (*this) -= 1;
+        (*this) += 1;
         return ret;
     }
 
     Range_Type operator-- () {
         return (*this) -= 1;
+    }
+
+    Range_Type operator-- (int) {
+        T ret = val;
+        (*this) -= 1;
+        return ret;
     }
 
     Range_Type operator+= (const Range_Type& a) {
