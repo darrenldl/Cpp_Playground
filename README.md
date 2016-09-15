@@ -55,10 +55,10 @@ Usage:
     
     # Operations supported
     Arithemetic         : +, -, *
-        i = 10;         // not okay as it causes overflow
-        i = -5; i + 6;  // gives 1
-        i = 1;  i - 7;  // not okay as it causes underflow
-        i = -1; i * 5;  // not okay as it causes overflow
+        i = 10;             // not okay as it causes overflow
+        i = -5; i + 6;      // gives 1
+        i = 1;  i - 7;      // not okay as it causes underflow
+        i = -1; i * -5;     // not okay as it causes overflow
         
     Increment/decrement : +=, -=, ++(both prefix and postfix), --(both prefix and postfix)
         i = 0; i += 2; // gives 2
