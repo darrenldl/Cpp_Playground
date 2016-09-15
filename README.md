@@ -55,13 +55,22 @@ Usage:
     
     # Operations supported
     Arithemetic         : +, -, *
-        i = 10;         // not okay as it causes overflow
-        i = -5; i + 6;  // gives 1
-        i = 1;  i - 7;  // not okay as it causes underflow
-        i = -1; i * 5;  // not okay as it causes overflow
+        i = 10;             // not okay as it causes overflow
+        i = -5; i + 6;      // gives 1
+        i = 1;  i - 7;      // not okay as it causes underflow
+        i = -1; i * -5;     // not okay as it causes overflow
         
     Increment/decrement : +=, -=, ++(both prefix and postfix), --(both prefix and postfix)
         i = 0; i += 2; // gives 2
+        
+    For-each loop
+        for (auto j : i) {
+            std::cout << j << endl; // prints out -5 to 3 (Note that 4 is not printed)
+        }
+        
+        for (auto j : Range_Type<int, 0, 5>()) {
+            std::cout << j << endl; // prints out 0 to 4 (Note that 5 is not printed)
+        }
     
     # Static asserts
         Type is asserted to be of integral type
