@@ -285,29 +285,61 @@ private:
         T max_multiplier_a_neg;
 
         if (a >= 0) {
-            max_multiplier_a_pos = upper_limit / a;
-            max_multiplier_a_neg = lower_limit / a;
+            if (upper_limit >= 0) {
+                max_multiplier_a_pos = upper_limit / a;
+            }
+            else {
+                max_multiplier_a_pos = 0;
+            }
+
+            if (lower_limit >= 0) {
+                max_multiplier_a_neg = 0;
+            }
+            else {
+                max_multiplier_a_neg = lower_limit / a;
+            }
         }
         else {
-            max_multiplier_a_pos = lower_limit / a;
-            max_multiplier_a_neg = upper_limit / a;
+            if (upper_limit >= 0) {
+                max_multiplier_a_neg = upper_limit / a;
+            }
+            else {
+                max_multiplier_a_neg = 0;
+            }
+
+            if (lower_limit >= 0) {
+                max_multiplier_a_pos = 0;
+            }
+            else {
+                max_multiplier_a_pos = lower_limit / a;
+            }
         }
 
         if (b >= 0) {
             if (max_multiplier_a_pos < b) {
                 error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
                 error_message << "Operation : " << +a << " * " << +b << std::endl;
-                error_message << "Multiplication causes overflow";
+                if (a >= 0) {
+                    error_message << "Multiplication causes overflow";
+                }
+                else {
+                    error_message << "Multiplication causes underflow";
+                }
                 throw RangeTypeException(error_message.str());
             }
 
             a *= b;
         }
         else {
-            if (max_multiplier_a_neg < (-b)) {
+            if (max_multiplier_a_neg > b) {
                 error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
                 error_message << "Operation : " << +a << " * " << +b << std::endl;
-                error_message << "Multiplication causes underflow";
+                if (a >= 0) {
+                    error_message << "Multiplication causes underflow";
+                }
+                else {
+                    error_message << "Multiplication causes overflow";
+                }
                 throw RangeTypeException(error_message.str());
             }
 
