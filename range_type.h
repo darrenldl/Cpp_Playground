@@ -1,5 +1,6 @@
 /* Range type template which functions similarly to range type in Ada
- * Exception is raised when the
+ * Exception RangeTypeException is thrown when overflow/underflow occurs
+ * RangeTypeException.what() contains the full error message
  *
  * Author : Darrenldl <dldldev@yahoo.com>
  *
