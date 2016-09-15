@@ -46,7 +46,13 @@ private:
 };
 
 template <typename T, long long int F, long long int L>
-class Range_Type {
+class Range_Type : public std::iterator<std::random_access_iterator_tag,
+                                          T,
+                                          T,
+                                          const T*,
+                                          T
+                                         >
+{
 
     static_assert(std::is_integral<T>::value,
                   "Type must be integral");
@@ -61,6 +67,22 @@ class Range_Type {
                   "First is larger than last");
 
 public:
+    using rand_iterator = std::iterator<std::random_access_iterator_tag, T, T, const T*, T>;
+
+    // iterator functions
+    static Range_Type begin () {
+        return Range_Type(F);
+    }
+
+    static Range_Type end () {
+        return Range_Type(L);
+    }
+
+    typename rand_iterator::reference operator* () const {
+        return val;
+    }
+
+    // class constructors and other functions
     Range_Type () : val {F} {}
 
     Range_Type (T a) : val {val_check(a)} {}
