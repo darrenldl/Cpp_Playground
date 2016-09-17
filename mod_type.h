@@ -65,9 +65,7 @@ public:
         return *this;
     }
 
-    operator T() const {
-        return this->val;
-    }
+    operator T() const = delete;
 
     T value () const {
         return this->val;
