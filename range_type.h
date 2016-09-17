@@ -32,6 +32,7 @@
  */
 
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <sstream>
 #include <stdexcept>
@@ -90,9 +91,18 @@ public:
 
     Range_Type (const Range_Type& a) : val {val_check(a.val)} {};
 
-    operator T () const {
-        return this->val;
+    Range_Type operator= (const Range_Type& a) {
+        this->val = val_check(a.val);
+        return *this;
     }
+
+    Range_Type operator= (const T& a) {
+        this->val = val_check(a);
+        return *this;
+    }
+
+    template<typename ANY_T>
+    operator ANY_T () const = delete;
 
     T value () const {
         return this->val;
@@ -210,6 +220,9 @@ public:
     }
 
 private:
+    // Spill_Proof is for internal use only
+    // it still overflows/underflows but only when the value is outside the range [-T_max^T_max, T_max^T_max]
+    // T_max is maximum possible value of type, ^ used above is power notation rather than bitwise XOR operation
     class Spill_Proof {
     private:
         static const T T_max = std::numeric_limits<T>::max();
@@ -225,29 +238,42 @@ private:
         Spill_Proof (const Spill_Proof& val) : multiplier {val.multiplier},
                                                remainder {val.remainder} {}
 
+        Spill_Proof operator= (const Spill_Proof& a) {
+            this->multiplier = a.multiplier;
+            this->remainder  = a.remainder;
+
+            return *this;
+        }
+
+        Spill_Proof operator= (const T a) {
+            *this = Spill_Proof(a);
+
+            return *this;
+        }
+
+        friend std::ostream& operator<< (std::ostream& out, const Spill_Proof& a) {
+            out << +T_max << " * " << +a.multiplier << " + " << +a.remainder;
+            return out;
+        }
+
         friend Spill_Proof operator+ (const Spill_Proof& a, const Spill_Proof& b) {
             Spill_Proof result;
 
             result.multiplier = a.multiplier + b.multiplier;
             result.remainder  = a.remainder;
-            result += b.remainder;
-
-            return result;
-        }
-
-        friend Spill_Proof operator+ (const Spill_Proof& a, const T& b) {
-            Spill_Proof result = a;
-
-            if (T_max - result.remainder.value() < b) {
+            if (T_max - result.remainder.value() < b.remainder.value()) {
                 result.multiplier++;
             }
-
-            result.remainder += b;
+            result.remainder += b.remainder;
 
             return result;
         }
 
-        friend Spill_Proof operator+ (const T& b, const Spill_Proof& a) {
+        friend Spill_Proof operator+ (const Spill_Proof& a, const T b) {
+            return a + Spill_Proof(b);
+        }
+
+        friend Spill_Proof operator+ (const T b, const Spill_Proof& a) {
             return a + b;
         }
 
@@ -256,24 +282,19 @@ private:
 
             result.multiplier = a.multiplier - b.multiplier;
             result.remainder  = a.remainder;
-            result -= b.remainder;
-
-            return result;
-        }
-
-        friend Spill_Proof operator- (const Spill_Proof& a, const T& b) {
-            Spill_Proof result = a;
-
-            if (result.remainder.value() < b) {
+            if (result.remainder.value() < b.remainder.value()) {
                 result.multiplier--;
             }
-
-            result.remainder -= b;
+            result.remainder -= b.remainder;
 
             return result;
         }
 
-        friend Spill_Proof operator- (const T& b, const Spill_Proof& a) {
+        friend Spill_Proof operator- (const Spill_Proof& a, const T b) {
+            return a - Spill_Proof(b);
+        }
+
+        friend Spill_Proof operator- (const T b, const Spill_Proof& a) {
             return a - b;
         }
 
@@ -282,7 +303,7 @@ private:
             return *this;
         }
 
-        Spill_Proof operator+= (const T& a) {
+        Spill_Proof operator+= (const T a) {
             *this = *this + a;
             return *this;
         }
@@ -292,7 +313,7 @@ private:
             return *this;
         }
 
-        Spill_Proof operator-= (const T& a) {
+        Spill_Proof operator-= (const T a) {
             *this = *this - a;
             return *this;
         }
@@ -306,7 +327,23 @@ private:
             }
         }
 
+        friend bool operator< (const Spill_Proof& a, const T b) {
+            return a < Spill_Proof(b);
+        }
+
+        friend bool operator< (const T b, const Spill_Proof& a) {
+            return a < b;
+        }
+
         friend bool operator>= (const Spill_Proof& a, const Spill_Proof& b) {
+            return !(a < b);
+        }
+
+        friend bool operator>= (const Spill_Proof& a, const T b) {
+            return !(a < b);
+        }
+
+        friend bool operator>= (const T b, const Spill_Proof& a) {
             return !(a < b);
         }
 
@@ -325,7 +362,7 @@ private:
 
         friend bool operator== (const Spill_Proof& a, const Spill_Proof& b) {
             if (a.multiplier == b.multiplier) {
-                return a.remainder == b.remainder;
+                return a.remainder.value() == b.remainder.value();
             }
             else {
                 return false;
@@ -376,11 +413,8 @@ private:
 
         val_check(a);
 
-        Spill_Proof up_space_left_a  =  upper_limit;
-        up_space_left_a              -= a;
-
-        Spill_Proof low_space_left_a =  a;
-        low_space_left_a             -= lower_limit;
+        Spill_Proof up_space_left_a  = Spill_Proof(upper_limit) - Spill_Proof(a);
+        Spill_Proof low_space_left_a = Spill_Proof(a)           - Spill_Proof(lower_limit);
 
         if (b >= 0) {   // normal addition
             if (up_space_left_a < b) {
@@ -441,11 +475,8 @@ private:
 
         val_check(a);
 
-        Spill_Proof up_space_left_a  =  upper_limit;
-        up_space_left_a              -= a;
-
-        Spill_Proof low_space_left_a =  a;
-        low_space_left_a             -= lower_limit;
+        Spill_Proof up_space_left_a  =  Spill_Proof (upper_limit) - Spill_Proof(a);
+        Spill_Proof low_space_left_a =  Spill_Proof(a)            - Spill_Proof(lower_limit);
 
         if (b >= 0) {   // normal subtraction
             if (low_space_left_a < b) {
