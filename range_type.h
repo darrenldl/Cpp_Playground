@@ -36,6 +36,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include "mod_type.h"
 
 #ifndef RANGE_TYPE_H_INCLUDED
 #define RANGE_TYPE_H_INCLUDED
