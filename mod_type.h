@@ -55,6 +55,16 @@ public:
 
     Mod_Type(const Mod_Type& a) : val {mod_val(a.val)} {}
 
+    Mod_Type operator= (const Mod_Type& a) {
+        this->val = mod_val(a.val);
+        return *this;
+    }
+
+    Mod_Type operator= (const T& a) {
+        this->val = mod_val(a);
+        return *this;
+    }
+
     operator T() const {
         return this->val;
     }
