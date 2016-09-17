@@ -142,11 +142,13 @@ public:
     }
 
     Mod_Type operator-= (const Mod_Type& a) {
-        return (*this) += -a;
+        this->val = mod_add(val, -a.val);
+        return *this;
     }
 
     Mod_Type operator-= (const T& a) {
-        return (*this) += -a;
+        this->val = mod_add(val, -mod_val(a));
+        return *this;
     }
 
     Mod_Type operator *= (const Mod_Type& a) {
