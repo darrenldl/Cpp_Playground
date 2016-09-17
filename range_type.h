@@ -219,6 +219,14 @@ public:
         return *this;
     }
 
+    friend bool operator== (const Range_Type& a, const Range_Type& b) {
+        return a.val == b.val;
+    }
+
+    friend bool operator!= (const Range_Type& a, const Range_Type& b) {
+        return a.val != b.val;
+    }
+
 private:
     // Spill_Proof is for internal use only
     // it still overflows/underflows but only when the value is outside the range [-T_max^T_max, T_max^T_max]
