@@ -98,3 +98,23 @@ Usage:
             Output:
             Range : [ -10, 10 ]    Operation : 0 + 11
             Addition causes overflow
+            
+        Slightly more extreme case:
+            Range_Type<int, -2147483648, 2147483647> k;     // assume lower limit of int is -2147483648
+                                                            // and upper limit is 2147483647
+            try {
+                k = 2147483647;     // works, obviously
+                std::cout << "k : " << k << std::endl;
+                k += -2147483648;   // still works, and gives -1
+                std::cout << "k : " << k << std::endl;
+                k += -2147483648;   // underflows, as shown by exception
+            }
+            catch (RangeTypeException e) {
+                std::cout << e.what() << std::endl;
+            }
+
+            Output:
+            k : 2147483647
+            k : -1
+            Range : [ -2147483648, 2147483647 ]    Operation : -1 + (-2147483648)
+            Addition causes overflow
