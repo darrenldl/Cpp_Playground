@@ -30,6 +30,7 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
+#include <ostream>
 #include <limits>
 
 #ifndef MOD_TYPE_H_INCLUDED
