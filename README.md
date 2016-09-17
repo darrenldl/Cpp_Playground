@@ -4,6 +4,8 @@ Random code for fun and possible usefulness
 
 Assumes C++11(and probably C++14) for the most part
 
+mod_type.h and range_type.h assumes your system is one's complement or two's complement at places, specifically the number of negative values and number of non-negative values are roughly equal(off by 1 at most).
+
 ## Content
 
 ### mod_type.h
