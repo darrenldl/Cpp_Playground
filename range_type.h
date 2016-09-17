@@ -448,14 +448,14 @@ private:
                 if (low_space_left_a == 0) {
                     error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
                     error_message << "Operation : " << +a << " + (" << +std::numeric_limits<T>::min() << ")" << std::endl;
-                    error_message << "Addition causes underflow" << std::endl;
+                    error_message << "Addition causes underflow";
                     throw RangeTypeException(error_message.str());
                 }
                 else if (low_space_left_a > 0) {
                     if (low_space_left_a - t_val < b) {
                         error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
                         error_message << "Operation : " << +a << " + (" << +std::numeric_limits<T>::min() << ")" << std::endl;
-                        error_message << "Addition causes underflow" << std::endl;
+                        error_message << "Addition causes underflow";
                         throw RangeTypeException(error_message.str());
                     }
                 }
