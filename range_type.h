@@ -66,9 +66,10 @@ class Range_Type : public std::iterator<std::random_access_iterator_tag,
     static_assert(F <= L,
                   "First is larger than last");
 
-public:
+private:
     using rand_iterator = std::iterator<std::random_access_iterator_tag, T, T, const T*, T>;
 
+public:
     // iterator functions
     static Range_Type begin () {
         return Range_Type(F);
@@ -209,8 +210,135 @@ public:
     }
 
 private:
+    class Spill_Proof {
+    private:
+        static const T T_max = std::numeric_limits<T>::max();
+
+    public:
+        Spill_Proof ()      : multiplier {0}, remainder {0} {}
+
+        Spill_Proof (T val) : multiplier {0} {
+            multiplier = val / T_max;
+            remainder = val;
+        }
+
+        Spill_Proof (const Spill_Proof& val) : multiplier {val.multiplier},
+                                               remainder {val.remainder} {}
+
+        friend Spill_Proof operator+ (const Spill_Proof& a, const Spill_Proof& b) {
+            Spill_Proof result;
+
+            result.multiplier = a.multiplier + b.multiplier;
+            result.remainder  = a.remainder;
+            result += b.remainder;
+
+            return result;
+        }
+
+        friend Spill_Proof operator+ (const Spill_Proof& a, const T& b) {
+            Spill_Proof result = a;
+
+            if (T_max - result.remainder.value() < b) {
+                result.multiplier++;
+            }
+
+            result.remainder += b;
+
+            return result;
+        }
+
+        friend Spill_Proof operator+ (const T& b, const Spill_Proof& a) {
+            return a + b;
+        }
+
+        friend Spill_Proof operator- (const Spill_Proof& a, const Spill_Proof& b) {
+            Spill_Proof result;
+
+            result.multiplier = a.multiplier - b.multiplier;
+            result.remainder  = a.remainder;
+            result -= b.remainder;
+
+            return result;
+        }
+
+        friend Spill_Proof operator- (const Spill_Proof& a, const T& b) {
+            Spill_Proof result = a;
+
+            if (result.remainder.value() < b) {
+                result.multiplier--;
+            }
+
+            result.remainder -= b;
+
+            return result;
+        }
+
+        friend Spill_Proof operator- (const T& b, const Spill_Proof& a) {
+            return a - b;
+        }
+
+        Spill_Proof operator+= (const Spill_Proof& a) {
+            *this = *this + a;
+            return *this;
+        }
+
+        Spill_Proof operator+= (const T& a) {
+            *this = *this + a;
+            return *this;
+        }
+
+        Spill_Proof operator-= (const Spill_Proof& a) {
+            *this = *this - a;
+            return *this;
+        }
+
+        Spill_Proof operator-= (const T& a) {
+            *this = *this - a;
+            return *this;
+        }
+
+        friend bool operator< (const Spill_Proof& a, const Spill_Proof& b) {
+            if (a.multiplier == b.multiplier) {
+                return a.remainder.value() < b.remainder.value();
+            }
+            else {
+                return a.multiplier < b.multiplier;
+            }
+        }
+
+        friend bool operator>= (const Spill_Proof& a, const Spill_Proof& b) {
+            return !(a < b);
+        }
+
+        friend bool operator> (const Spill_Proof& a, const Spill_Proof& b) {
+            if (a.multiplier == b.multiplier) {
+                return a.remainder.value() > b.remainder.value();
+            }
+            else {
+                return a.multiplier > b.multiplier;
+            }
+        }
+
+        friend bool operator<= (const Spill_Proof& a, const Spill_Proof& b) {
+            return !(a > b);
+        }
+
+        friend bool operator== (const Spill_Proof& a, const Spill_Proof& b) {
+            if (a.multiplier == b.multiplier) {
+                return a.remainder == b.remainder;
+            }
+            else {
+                return false;
+            }
+        }
+
+    private:
+        T multiplier;
+        Mod_Type<T, T_max> remainder;
+    };
+
     static const T lower_limit = F;
-    static const T upper_limit  = L;
+    static const T upper_limit = L;
     T val;
 
     static T low_limit () {
@@ -248,8 +376,11 @@ private:
 
         val_check(a);
 
-        const T up_space_left_a  = upper_limit - a;
-        const T low_space_left_a = a           - lower_limit;
+        Spill_Proof up_space_left_a  =  upper_limit;
+        up_space_left_a              -= a;
+
+        Spill_Proof low_space_left_a =  a;
+        low_space_left_a             -= lower_limit;
 
         if (b >= 0) {   // normal addition
             if (up_space_left_a < b) {
@@ -262,15 +393,44 @@ private:
             a += b;
         }
         else {  // subtraction
-            b = -b;
-            if (low_space_left_a < b) {
-                error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
-                error_message << "Operation : " << +a << " + (-" << +b << ")" << std::endl;
-                error_message << "Addition causes underflow";
-                throw RangeTypeException(error_message.str());
+            T t_val = 0;
+
+            if (b == std::numeric_limits<T>::min()) {
+                // prevent negating from wrapping back to same value
+                // this is to deal with case where number of negative values is one greater than number of non-negative values
+                // aka two's complement
+                t_val = 1;      // put 1 aside to avoid overflow in negation
+                b += t_val;
+
+                b = -b;
+                if (low_space_left_a == 0) {
+                    error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
+                    error_message << "Operation : " << +a << " + (" << +std::numeric_limits<T>::min() << ")" << std::endl;
+                    error_message << "Addition causes underflow" << std::endl;
+                    throw RangeTypeException(error_message.str());
+                }
+                else if (low_space_left_a > 0) {
+                    if (low_space_left_a - t_val < b) {
+                        error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
+                        error_message << "Operation : " << +a << " + (" << +std::numeric_limits<T>::min() << ")" << std::endl;
+                        error_message << "Addition causes underflow" << std::endl;
+                        throw RangeTypeException(error_message.str());
+                    }
+                }
+                /* low_space_left_a < 0 will not hold due to val_check at front */
+            }
+            else {
+                b = -b;
+                if (low_space_left_a < b) {
+                    error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
+                    error_message << "Operation : " << +a << " + (-" << +b << ")" << std::endl;
+                    error_message << "Addition causes underflow";
+                    throw RangeTypeException(error_message.str());
+                }
             }
 
             a -= b;
+            a -= t_val;
         }
 
         return a;
@@ -281,8 +441,11 @@ private:
 
         val_check(a);
 
-        const T up_space_left_a  = upper_limit - a;
-        const T low_space_left_a = a           - lower_limit;
+        Spill_Proof up_space_left_a  =  upper_limit;
+        up_space_left_a              -= a;
+
+        Spill_Proof low_space_left_a =  a;
+        low_space_left_a             -= lower_limit;
 
         if (b >= 0) {   // normal subtraction
             if (low_space_left_a < b) {
