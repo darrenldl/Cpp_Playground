@@ -65,7 +65,8 @@ public:
         return *this;
     }
 
-    operator T() const = delete;
+    template<typename ANY_T>
+    operator ANY_T() const = delete;
 
     T value () const {
         return this->val;
