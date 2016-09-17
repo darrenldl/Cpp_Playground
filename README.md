@@ -11,6 +11,8 @@ mod_type.h and range_type.h assumes your system is one's complement or two's com
 ### mod_type.h
 Template for modulo type, which behaves similarly to modulo type in Ada
 
+No requirement of other libraries/headers
+
 Usage:
 
     # General format
@@ -46,6 +48,8 @@ Usage:
 
 ### range_type.h
 Template for range type, which behaves similarly to range type in Ada
+
+Requires Mod_Type from mod_type.h
 
 Usage:
 
