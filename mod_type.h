@@ -171,6 +171,30 @@ public:
         return *this;
     }
 
+    friend bool operator== (const Mod_Type& a, const Mod_Type& b) {
+        return a.val == b.val;
+    }
+
+    friend bool operator== (const Mod_Type& a, const T& b) {
+        return a == Mod_Type(b);
+    }
+
+    friend bool operator== (const T& b, const Mod_Type& a) {
+        return a == b;
+    }
+
+    friend bool operator!= (const Mod_Type& a, const Mod_Type& b) {
+        return !(a == b);
+    }
+
+    friend bool operator!= (const Mod_Type& a, const T& b) {
+        return !(a == b);
+    }
+
+    friend bool operator!= (const T& b, const Mod_Type& a) {
+        return !(a == b);
+    }
+
 private:
     static const T upper_bound = UB;
     T val;
