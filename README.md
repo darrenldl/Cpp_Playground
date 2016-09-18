@@ -26,7 +26,10 @@ Usage:
         i + 6;  // gives 1
         i - 7;  // gives 3
     Increment/decrement : +=, -=, ++(both prefix and postfix), --(both prefix and postfix)
-        i += 500; // gives 0 still, since 500 is multiple of 5
+        i += 500;   // gives 0 still, since 500 is multiple of 5
+    Comparison          : ==(congruent), !=(not congruent)
+        i = 1;
+        i == 111;   // returns true, since 111 is congruent to 1 modulo 5
     
     # Static asserts
         Type is asserted to be of integral type
