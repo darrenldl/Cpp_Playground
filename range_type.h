@@ -155,7 +155,7 @@ public:
     }
 
     friend Range_Type operator- (const T& b, const Range_Type& a) {
-        return a.val_add(a.val, -b);
+        return a.val_sub(a.val, b);
     }
 
     friend Range_Type operator* (const Range_Type& a, const Range_Type& b) {

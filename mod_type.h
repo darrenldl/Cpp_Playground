@@ -102,7 +102,7 @@ public:
     }
 
     friend Mod_Type operator- (const Mod_Type& a, const T& b) {
-        return a + (-b);
+        return a + (-mod_val(b));
     }
 
     friend Mod_Type operator- (const T& b, const Mod_Type& a) {
