@@ -170,15 +170,6 @@ public:
         return a.val_mul(b,     a.val);
     }
 
-    template<typename ANY_T, ANY_T ANY_T_F, ANY_T ANY_T_L>
-    friend Range_Type operator/ (const Range_Type& a, const Range_Type<ANY_T, ANY_T_F, ANY_T_L>& b) = delete;
-
-    template<typename ANY_T>
-    friend Range_Type operator/ (const Range_Type& a, const ANY_T& b) = delete;
-
-    template<typename ANY_T>
-    friend Range_Type operator/ (const ANY_T& b, const Range_Type& a) = delete;
-
     Range_Type operator++ () {
         return (*this) += 1;
     }
