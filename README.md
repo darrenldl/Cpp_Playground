@@ -132,3 +132,13 @@ Usage:
             k : -1
             Range : [ -2147483648, 2147483647 ]    Operation : -1 + (-2147483648)
             Addition causes underflow
+
+### ranged_ptr.h
+Template for ranged pointer, mainly to provide byte(unsigned char) level access to an object(class/struct) with bound checking
+
+Requires Mod_Type from mod_type.h
+Requires Range_Type from range_type.h (range_type.h already includes mod_type.h)
+
+Usage:
+
+    # General format
