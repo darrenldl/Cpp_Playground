@@ -143,7 +143,7 @@ public:
     }
 
     friend Range_Type operator+ (const T& b, const Range_Type& a) {
-        return a.val_add(a.val, b);     // b is not checked for range by putting on right
+        return a.val_add(a.val, b);
     }
 
     friend Range_Type operator- (const Range_Type& a, const Range_Type& b) {
@@ -155,7 +155,7 @@ public:
     }
 
     friend Range_Type operator- (const T& b, const Range_Type& a) {
-        return a.val_add(a.val, -b);    // b is not checked for range by putting on right
+        return a.val_add(a.val, -b);
     }
 
     friend Range_Type operator* (const Range_Type& a, const Range_Type& b) {
