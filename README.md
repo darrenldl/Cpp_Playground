@@ -58,9 +58,16 @@ Usage:
 
     # General format
         Range_Type<integral_type, first_value, last_value> variable_name;
+        No_Wrap<integral_type> variable_name;
+        // No_Wrap<integral_type> variable name is same as
+        // Range_Type < integral_type,
+        //              std::numeric_limits<integral_type>::min(),
+        //              std::numeric_limits<integral_type>::max()
+        //            >
     # Example
         Range_Type<int, -5, 4> i;  // by default initialised to first_val, in this case, -5
         All operations on i will be checked for range, i must be in [-5, 4]
+        No_Wrap<int> j;            // j will not wrap around the int limits
     
     # Operations supported
     Arithemetic         : +, -, *
