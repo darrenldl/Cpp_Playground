@@ -498,15 +498,44 @@ private:
             a -= b;
         }
         else {  // addition
-            b = -b;
-            if (up_space_left_a < b) {
-                error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
-                error_message << "Operation : " << +a << " - (-" << +b << ")" << std::endl;
-                error_message << "Subtraction causes overflow";
-                throw RangeTypeException(error_message.str());
+            T t_val = 0;
+
+            if (b == std::numeric_limits<T>::min()) {
+                // prevent negating from wrapping back to same value
+                // this is to deal with case where number of negative values is one greater than number of non-negative values
+                // aka two's complement
+                t_val = 1;      // put 1 aside to avoid overflow in negation
+                b += t_val;
+
+                b = -b;
+                if (up_space_left_a == 0) {
+                    error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
+                    error_message << "Operation : " << +a << " - (" << +std::numeric_limits<T>::min() << ")" << std::endl;
+                    error_message << "Subtraction causes overflow";
+                    throw RangeTypeException(error_message.str());
+                }
+                else if (up_space_left_a > 0) {
+                    if (up_space_left_a - t_val < b) {
+                        error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
+                        error_message << "Operation : " << +a << " - (" << +std::numeric_limits<T>::min() << ")" << std::endl;
+                        error_message << "Subtraction causes overflow";
+                        throw RangeTypeException(error_message.str());
+                    }
+                }
+                /* up_space_left_a < 0 will not hold due to val_check at front */
+            }
+            else {
+                b = -b;
+                if (up_space_left_a < b) {
+                    error_message << "Range : [ " << +low_limit() << ", " << +up_limit() << " ]    ";
+                    error_message << "Operation : " << +a << " - (-" << +b << ")" << std::endl;
+                    error_message << "Subtraction causes overflow";
+                    throw RangeTypeException(error_message.str());
+                }
             }
 
             a += b;
+            a += t_val;
         }
 
         return a;
