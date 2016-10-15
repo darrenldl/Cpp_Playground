@@ -624,4 +624,7 @@ private:
     }
 };
 
+template<typename T>
+using No_Wrap = Range_Type<T, std::numeric_limits<T>::min(), std::numeric_limits<T>::max()>;
+
 #endif // RANGE_TYPE_H_INCLUDED
