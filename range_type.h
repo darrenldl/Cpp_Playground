@@ -143,7 +143,7 @@ public:
     }
 
     friend Range_Type operator+ (const T& b, const Range_Type& a) {
-        return a.val_add(a.val, b);
+        return a.val_add(b,     a.val);
     }
 
     friend Range_Type operator- (const Range_Type& a, const Range_Type& b) {
@@ -155,7 +155,7 @@ public:
     }
 
     friend Range_Type operator- (const T& b, const Range_Type& a) {
-        return a.val_sub(a.val, b);
+        return a.val_sub(b,     a.val);
     }
 
     friend Range_Type operator* (const Range_Type& a, const Range_Type& b) {
@@ -167,7 +167,7 @@ public:
     }
 
     friend Range_Type operator* (const T& b, const Range_Type& a) {
-        return a.val_mul(a.val, b);
+        return a.val_mul(b,     a.val);
     }
 
     template<typename ANY_T, ANY_T ANY_T_F, ANY_T ANY_T_L>

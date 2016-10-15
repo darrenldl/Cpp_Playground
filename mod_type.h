@@ -98,15 +98,15 @@ public:
     }
 
     friend Mod_Type operator+ (const T& b, const Mod_Type& a) {
-        return a + b;
+        return mod_add(b,     a.val);
     }
 
     friend Mod_Type operator- (const Mod_Type& a, const T& b) {
-        return a + (-mod_val(b));
+        return mod_sub(a.val, b);
     }
 
     friend Mod_Type operator- (const T& b, const Mod_Type& a) {
-        return b + (-a);
+        return mod_sub(b,     a.val);
     }
 
     friend Mod_Type operator* (const Mod_Type& a, const Mod_Type& b) {
@@ -118,7 +118,7 @@ public:
     }
 
     friend Mod_Type operator* (const T& b, const Mod_Type& a) {
-        return a * b;
+        return mod_mul(b,     a.val);
     }
 
     template<typename ANY_T, ANY_T ANY_T_UB>
@@ -256,6 +256,13 @@ private:
         }
 
         return mod_val(a);
+    }
+
+    static T mod_sub (T a, T b) {
+        a =  mod_val(a);
+        b = -mod_val(b);
+
+        return mod_add(a, b);
     }
 
     static T mod_mul (T a, T b) {
