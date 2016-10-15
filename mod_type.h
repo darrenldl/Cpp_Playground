@@ -121,6 +121,15 @@ public:
         return a * b;
     }
 
+    template<typename ANY_T, ANY_T ANY_T_UB>
+    friend Mod_Type operator/ (const Mod_Type& a, const Mod_Type<ANY_T, ANY_T_UB>& b) = delete;
+
+    template<typename ANY_T>
+    friend Mod_Type operator/ (const Mod_Type& a, const ANY_T& b) = delete;
+
+    template<typename ANY_T>
+    friend Mod_Type operator/ (const ANY_T& b, const Mod_Type& a) = delete;
+
     Mod_Type operator++ () {
         return (*this) += 1;
     }

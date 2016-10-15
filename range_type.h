@@ -167,8 +167,17 @@ public:
     }
 
     friend Range_Type operator* (const T& b, const Range_Type& a) {
-        return a.val_mul(a.val, b);     // b is not checked for range by putting on right
+        return a.val_mul(a.val, b);
     }
+
+    template<typename ANY_T, ANY_T ANY_T_F, ANY_T ANY_T_L>
+    friend Range_Type operator/ (const Range_Type& a, const Range_Type<ANY_T, ANY_T_F, ANY_T_L>& b) = delete;
+
+    template<typename ANY_T>
+    friend Range_Type operator/ (const Range_Type& a, const ANY_T& b) = delete;
+
+    template<typename ANY_T>
+    friend Range_Type operator/ (const ANY_T& b, const Range_Type& a) = delete;
 
     Range_Type operator++ () {
         return (*this) += 1;
