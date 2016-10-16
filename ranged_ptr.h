@@ -89,6 +89,10 @@ public:
         return sizeof(T);
     }
 
+    ptr_int index () const {
+        return cur - base;
+    }
+
     friend std::ostream& operator<< (std::ostream& out, const Ranged_Ptr& r_ptr) {
         out << (void*) r_ptr.cur;
         return out;
