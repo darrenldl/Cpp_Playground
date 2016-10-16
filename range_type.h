@@ -102,6 +102,10 @@ public:
         return *this;
     }
 
+    operator T () const {
+        return val;
+    }
+
     template<typename ANY_T>
     operator ANY_T () const = delete;
 
