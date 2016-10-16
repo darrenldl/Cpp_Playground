@@ -182,7 +182,7 @@ Usage:
     
     Pointer internal variable read
         t_ptr.ptr()     // gives the unsigned char* pointer that points to where it is currently pointing to
-        t_ptr.obj()     // gives the Tester* pointer to that points to tester
+        t_ptr.obj()     // gives the Tester& reference to tester
             
     # Static asserts
         None
