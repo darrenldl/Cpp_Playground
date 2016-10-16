@@ -7,6 +7,11 @@ Assumes C++11(and probably C++14) for the most part
 mod_type.h and range_type.h assumes your system is one's complement or two's complement at places, specifically the number of negative values and number of non-negative values are roughly equal(off by 1 at most).
 
 ## Content
+[Mod_Type](#mod_typeh)
+
+[Range_Type](#range_typeh)
+
+[Ranged_Ptr](#ranged_ptrh)
 
 ### mod_type.h
 Template for modulo type, which behaves similarly to modulo type in Ada
@@ -137,6 +142,7 @@ Usage:
 Template for ranged pointer, mainly to provide byte(unsigned char) level access to an object(class/struct) with bound checking
 
 Requires Mod_Type from mod_type.h
+
 Requires Range_Type from range_type.h (range_type.h already includes mod_type.h)
 
 Usage:
