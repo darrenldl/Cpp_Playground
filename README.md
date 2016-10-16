@@ -215,4 +215,27 @@ Usage:
             
             Note that y is still overwritten, but the for loop did not overwrite beyond tester's memory
             
-        Example using pointer
+        Example using pointer increment
+            // assume sizeof(int) is 4, and no padding in Tester
+            try {
+                unsigned char* end_ptr = (unsigned char*) &tester + 10;  // wrong calculation
+                for (t_ptr = t_ptr.obj(); t_ptr < end_ptr; t_ptr++) {   // cast from Ranged_Ptr to unsigned char* is allowed
+                    *t_ptr = 0xFF;
+                }
+            }
+            catch (RangedPtrException e) {
+                std::cout << e.what() << std::endl;
+            }
+
+            std::cout << "x : " << tester.x << std::endl;
+            std::cout << "y : " << tester.y << std::endl;
+
+            Output:
+            Pointer addition results in out of bound pointer value
+            Expressed in pointers:
+            Range : [ 0xffffcba0, 0xffffcba7 ]    Goal : 0xffffcba8
+            Expressed in indices:
+            Range : [ 0, 7 ]    Operation : 7 + 1
+            Addition causes overflow
+            x : -1
+            y : -1
