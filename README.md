@@ -141,4 +141,78 @@ Requires Range_Type from range_type.h (range_type.h already includes mod_type.h)
 
 Usage:
 
-    # General format
+    # Following class is used for demonstration in following code
+    class Tester {
+    public:
+        int x = 0;
+        int y = 0;
+    };
+
+    # General format/Example
+        Tester tester;
+        Ranged_Ptr<Tester> t_ptr(tester);   // by default initialised to &tester
+    
+    # Operations supported
+    Arithmetic           : +, -
+        For both +, -, only Ranged_Ptr, integer addition/subtraction allowed
+    
+    Increment/decrement  : +=, -=, ++(both prefix and postfix), --(both prefix and postfix)
+    
+    Object member access : ->
+        Example
+            t_ptr = &t_ptr->x;   // equavalent to t_ptr = &tester.x;
+    
+    Pointer related      : *, []
+        Ranged_Ptr's value is a pointer of type unsigned char* pointing to within the object
+        Example:
+            // After initialisation above
+            *t_ptr is same as *((unsigned char*) &tester)
+            t_ptr++;
+            *t_ptr is now same as *((unsigned char*) (&tester + 1))
+            *(t_ptr + 2) is same as *((unsigned char*) (&tester + 3))
+            t_ptr[2] is same as *((unsigned char*) (&tester + 3))       // array access starts on the unsigned char it is pointing at
+            
+            All above operations are still range checked
+    
+    Pointer internal variable read
+        t_ptr.ptr()     // gives the unsigned char* pointer that points to where it is currently pointing to
+        t_ptr.obj()     // gives the Tester* pointer to that points to tester
+            
+    # Static asserts
+        None
+    
+    # Out of bound handling
+        All out of bound operation will throw RangedPtrException
+        RangedPtrException.what() will give complete error message
+        
+        All failing operations will not result change in value of the Ranged_Ptr variable
+        
+        Example using pointer offsetting:
+            t_ptr = t_ptr.obj();    // reset pointer
+            // assume sizeof(int) is 4, and no padding in Tester
+            t_ptr = &t_ptr->x;
+            try {
+                for (int i = 0; i < 10; i++) {  // wrong terminating condition
+                    *(t_ptr + i) = 0xFF;    // same error message if using t_ptr[i] = 0xFF;
+                }
+            }
+            catch (RangedPtrException e) {
+                std::cout << e.what() << std::endl;
+            }
+            
+            std::cout << "x : " << tester.x << std::endl;
+            std::cout << "y : " << tester.y << std::endl;
+            
+            Output:
+            Pointer addition results in out of bound pointer value
+            Expressed in pointers:
+            Range : [ 0xffffcb80, 0xffffcb87 ]    Goal : 0xffffcb88
+            Expressed in indices:
+            Range : [ 0, 7 ]    Operation : 0 + 8
+            Addition causes overflow
+            x : -1
+            y : -1
+            
+            Note that y is still overwritten, but the for loop did not overwrite beyond tester's memory
+            
+        Example using pointer
