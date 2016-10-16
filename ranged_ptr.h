@@ -23,11 +23,11 @@ private:
 public:
     Ranged_Ptr() = delete;
 
-    Ranged_Ptr(const T& target_obj) : obj_ptr {&target_obj}, base {(const unsigned char*) &target_obj}, cur {(unsigned char*) base} {}
+    Ranged_Ptr(const T& target_obj) : obj_ref {target_obj}, base {(const unsigned char*) &target_obj}, cur {(unsigned char*) base} {}
 
-    Ranged_Ptr(const T& target_obj, const unsigned char* in_cur) : obj_ptr {&target_obj}, base {(const unsigned char*) &target_obj}, cur {ptr_check(*this, in_cur)} {}
+    Ranged_Ptr(const T& target_obj, const unsigned char* in_cur) : obj_ref {target_obj}, base {(const unsigned char*) &target_obj}, cur {ptr_check(*this, in_cur)} {}
 
-    Ranged_Ptr(const Ranged_Ptr& r_ptr) : obj_ptr {r_ptr.obj_ptr}, base {r_ptr.base}, cur {ptr_check(*this, r_ptr.cur)} {}
+    Ranged_Ptr(const Ranged_Ptr& r_ptr) : obj_ref {r_ptr.obj_ref}, base {r_ptr.base}, cur {ptr_check(*this, r_ptr.cur)} {}
 
     Ranged_Ptr operator= (const Ranged_Ptr& r_ptr) {
         std::ostringstream error_message;
@@ -50,7 +50,7 @@ public:
     }
 
     T* operator-> () const {
-        return (T*) obj_ptr;
+        return (T*) &obj_ref;
     }
 
     unsigned char& operator* () const {
@@ -73,8 +73,8 @@ public:
         return this->cur;
     }
 
-    T* obj () const {
-        return (T*) this->obj_ptr;
+    T& obj () const {
+        return (T&) this->obj_ref;
     }
 
     unsigned char* first () const {
@@ -226,7 +226,7 @@ public:
     }
 
 private:
-    const T* const obj_ptr;
+    const T& obj_ref;
     const unsigned char* const base;
     unsigned char* cur;
 
